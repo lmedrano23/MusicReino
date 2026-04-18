@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reino Music Player</title>
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+        }
+
+        #playlist {
+            margin-top: 20px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: left;
+        }
+
+        .track {
+            padding: 8px;
+            cursor: pointer;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .track:hover {
+            background-color: #f0f0f0;
+        }
+
+        .active {
+            background-color: #d0e6ff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<h2>I Have No Music and I Must Sing.</h2>
+
+<input type="file" id="folderInput" webkitdirectory multiple>
+
+<br><br>
+
+<button onclick="prevTrack()"><< Previous</button>
+<button onclick="playPause()">Play/Pause</button>
+<button onclick="nextTrack()">Next >></button>
+
+<p id="trackDisplay">No track loaded</p>
+
+<audio id="player" controls></audio>
+
+<div id="playlist"></div>
+
+<script>
+let tracklist = [];
+let trackNames = [];
+let trackIdx = 0;
+
+const player = document.getElementById("player");
+const display = document.getElementById("trackDisplay");
+const playlistDiv = document.getElementById("playlist");
+
+// Load folder
+document.getElementById("folderInput").addEventListener("change", (e) => {
+    const files = Array.from(e.target.files);
+
+    tracklist = [];
+    trackNames = [];
+
+    files.forEach(file => {
+        if (file.type.startsWith("audio/")) {
+            tracklist.push(URL.createObjectURL(file));
+            trackNames.push(file.name);
+        }
+    });
+
+    trackIdx = 0;
+
+    renderPlaylist();
+
+    if (tracklist.length > 0) {
+        loadTrack();
+    }
+});
+
+// Render playlist UI
+function renderPlaylist() {
+    playlistDiv.innerHTML = "";
+
+    trackNames.forEach((name, index) => {
+        const div = document.createElement("div");
+        div.textContent = name;
+        div.classList.add("track");
+
+        if (index === trackIdx) {
+            div.classList.add("active");
+        }
+
+        div.onclick = () => {
+            trackIdx = index;
+            loadTrack();
+        };
+
+        playlistDiv.appendChild(div);
+    });
+}
+
+// Load + play track
+function loadTrack() {
+    player.src = tracklist[trackIdx];
+    player.play();
+    display.textContent = trackNames[trackIdx];
+    renderPlaylist(); // update highlight
+}
+
+// Controls
+function nextTrack() {
+    if (tracklist.length === 0) return;
+
+    trackIdx = (trackIdx + 1) % tracklist.length;
+    loadTrack();
+}
+
+function prevTrack() {
+    if (tracklist.length === 0) return;
+
+    trackIdx = (trackIdx - 1 + tracklist.length) % tracklist.length;
+    loadTrack();
+}
+
+function playPause() {
+    if (!player.src) return;
+
+    if (player.paused) {
+        player.play();
+    } else {
+        player.pause();
+    }
+}
+
+// Auto-play next track
+player.addEventListener("ended", () => {
+    if (tracklist.length === 0) return;
+
+    trackIdx = (trackIdx + 1) % tracklist.length;
+    loadTrack();
+});
+</script>
+
+</body>
+</html>
