@@ -1,6 +1,10 @@
 from tkinter import *
 from tkinter import ttk
 import os
+import pygame
+
+#intializing audio player:
+pygame.mixer.init()
 
 play_list = r"./The_Playlist/"
 
@@ -13,7 +17,8 @@ tracklist = []
 trackNames = []
 #track index:
 trackIdx = 0
-
+#volume variable:
+volume = 70
 with os.scandir(play_list) as entries:
         for entry in entries:
             if entry.is_file():
@@ -23,29 +28,48 @@ with os.scandir(play_list) as entries:
 
 def nextTrack():
     global trackIdx
-    trackIdx += 1
+
     if not (trackIdx == len(tracklist)):
-        print(trackNames[trackIdx])
+
+        trackIdx += 1
+        pygame.mixer.music.load(tracklist[trackIdx])
+        #labelName.set(f"{trackNames[trackIdx]}")
+        pygame.mixer.music.play(loops=0)
     else:
         print("Limit reached.")
 
 def prevTrack():
     global trackIdx
-    trackIdx -= 1
+    
     if not (trackIdx < 0):
-        print(trackNames[trackIdx])
+
+        trackIdx -= 1
+        pygame.mixer.music.load(tracklist[trackIdx])
+        #labelName.set(f"{trackNames[trackIdx]}")
+        pygame.mixer.music.play(loops=0)
     else:
         print("Limit reached.")
 
 def playPause():
     global play_button_state
     if play_button_state == True:
-        print(play_button_state)
+        pygame.mixer.music.pause()
         play_button_state = False
+
     elif play_button_state == False:
-        print(play_button_state)
+        pygame.mixer.music.unpause()
         play_button_state = True
-    #print(play_button_state)
+        
+        
+        
+
+def volControl(volume):
+    #print(f"Current Volume: {volume}%")
+    vol = float(volume)/100
+    pygame.mixer.music.set_volume(vol)
+
+pygame.mixer.music.load(tracklist[trackIdx])
+#labelName.set(f"{trackNames[trackIdx]}")
 
 root = Tk()
 frm = ttk.Frame(root)
@@ -65,4 +89,19 @@ nextButton.place(relx=0.6, rely=0.5, anchor="center")
 
 ppButton = ttk.Button(root, text="Play/Pause", command=playPause)
 ppButton.place(relx=0.4, rely=0.5, anchor="center")
+
+#volume slider:
+volume_slider = ttk.Scale(root, from_=0, to=100, orient=HORIZONTAL, command=volControl)
+volume_slider.grid(column=800, row=800)
+#volume_slider.pack()
+volume_slider.set(volume)  # Set default volume
+
+pygame.mixer.music.play(loops=0)
+
+#labelName = Tk.StringVar()
+#labelName.set(f"{trackNames[trackIdx]}")
+#labelName.grid(column=600, row=600)
+#labelName = ttk.Label(root, text=).grid(column=600, row=600)
+
+
 root.mainloop()
