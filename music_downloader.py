@@ -19,7 +19,7 @@ i.e. it'll create it if not found.
 '''
 
 playlist_url = "https://www.youtube.com/playlist?list=" #PLACE PREFERED YOUTUBE PLAYLIST LINK HERE
-play_list = r"C:\...\The_Playlist" #FILL IN YOUR PREFERED PATH HERE
+play_list = r"C:\...\Desktop\The_Playlist" #FILL IN YOUR PREFERED PATH HERE
 
 #safety net for lost/missing folder
 os.makedirs(play_list, exist_ok=True)
